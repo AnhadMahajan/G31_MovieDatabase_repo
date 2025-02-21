@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Watchlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8">
+
+    <h1 class="text-4xl font-bold mb-8">📌 My Watchlist</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+        {% for movie in watchlist_movies %}
+        <div class="bg-gray-800 rounded-lg p-4 shadow-lg">
+            <a href="{{ url_for('movie_details', movie_id=movie[0]) }}">
+                <img src="{{ movie[2] }}" alt="{{ movie[1] }}" class="w-full h-64 object-cover rounded-lg shadow-md">
+                <div class="mt-4">
+                    <h2 class="text-xl font-semibold">{{ movie[1] }}</h2>
+                </div>
+            </a>
+        </div>
+        {% else %}
+        <p class="text-gray-400">Your watchlist is empty.</p>
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('index') }}" class="block mt-6 text-yellow-400 hover:underline">← Back to Movie List</a>
+
+</body>
+</html>

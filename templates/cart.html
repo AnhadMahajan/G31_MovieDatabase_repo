@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title_block %}Movie Watchlist | My Collection{% endblock %}
+
+{% block main_block %}
+<!-- Add required CDN links -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+  .watchlist-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #32322f;
+    min-height: 80vh;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-title {
+    font-size: 2rem;
+    margin: 0;
+  }
+
+  .movies-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 1rem;
+  }
+
+  .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .movie-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+ 
+
+
+  .movie-details {
+    padding: 1.5rem;
+  }
+
+  .movie-title {
+    font-size: 1.25rem;
+    margin: 0 0 1rem 0;
+    color: #2c3e50;
+  }
+
+  .movie-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .rating i {
+    color: #f1c40f;
+    
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-remove {
+    background: #e74c3c;
+    color: white;
+  }
+
+  .btn-remove:hover {
+    background: #c0392b;
+  }
+
+  .btn-review {
+    background: #2ecc71;
+    color: white;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+  }
+
+  .btn-review:hover {
+    background: #27ae60;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: #bdc3c7;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state p {
+    color: #7f8c8d;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .bottom-actions {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .movie-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+  }
+  .rt{
+    color: #f1c40f;
+  }
+</style>
+
+<div class="watchlist-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1 class="header-title">My Movie Watchlist</h1>
+      {% if cart_items %}
+        <span class="movies-count">{{ cart_items|length }} Movies</span>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if cart_items %}
+    <div class="movie-grid">
+      {% for item in cart_items %}
+        <article class="movie-card">
+          <div class="movie-image">
+            <i class="fas fa-film"></i>
+          </div>
+          <div class="movie-details">
+            <h2 class="movie-title">{{ item.book.title }}</h2>
+            <div class="movie-meta">
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <span class="rt">{{ item.book.price }}/10</span>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button 
+                onclick="removeMovie(this, '{{ url_for('remove_from_cart', book_id=item.book.id) }}')" 
+                class="btn btn-remove"
+                aria-label="Remove {{ item.book.title }} from watchlist">
+                <i class="fas fa-trash-alt"></i>
+                Remove
+              </button>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    <div class="bottom-actions">
+      <a href="{{ url_for('place_order') }}" class="btn btn-review">
+        <i class="fas fa-clipboard-check"></i>
+        Request Movie Reviews
+      </a>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <i class="fas fa-film"></i>
+      <h3>Your Watchlist is Empty</h3>
+      <p>Start adding movies to your watchlist to keep track of what you want to watch next!</p>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  // GSAP Animations
+  document.addEventListener('DOMContentLoaded', () => {
+    // Header animation
+    gsap.from('.page-header', {
+      duration: 1,
+      y: -50,
+      opacity: 0,
+      ease: 'power3.out'
+    });
+
+    // Movie cards animation
+    gsap.from('.movie-card', {
+      duration: 0.8,
+      y: 50,
+      opacity: 0,
+      stagger: 0.1,
+      ease: 'power3.out'
+    });
+
+    // Bottom button animation
+    gsap.from('.bottom-actions', {
+      duration: 1,
+      y: 30,
+      opacity: 0,
+      delay: 0.5,
+      ease: 'power3.out'
+    });
+  });
+
+  // Remove movie animation
+  function removeMovie(button, url) {
+    const card = button.closest('.movie-card');
+    
+    gsap.to(card, {
+      duration: 0.5,
+      scale: 0.9,
+      opacity: 0,
+      ease: 'power3.inOut',
+      onComplete: () => window.location.href = url
+    });
+  }
+</script>
+{% endblock %}

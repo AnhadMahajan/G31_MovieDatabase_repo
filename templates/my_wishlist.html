@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title_block %}Your Cart{% endblock %}
+
+{% block main_block %}
+<div class="container">
+    <h2>Your wishlist </h2>
+    {% if cart_items %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Movie Name</th>
+                <!-- <th>Author</th> -->
+                <th>Rating</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.book.title }}</td>
+                <!-- <td>{{ item.book.author }}</td> -->
+                <td>{{ item.book.price }}</td>
+                <td><a href="{{ url_for('remove_from_cart', book_id=item.book.id) }}" class="btn btn-danger">Remove</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- <h4>Total Price: {{ total_price }}</h4> -->
+    <a href="{{ url_for('place_order') }}" class="btn btn-success">Request Cancellation</a>
+    {% else %}
+    <p>Your cart is not empty.</p>
+    {% endif %}
+</div>
+{% endblock %}

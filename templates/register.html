@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title_block %}Register{% endblock %}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --card-bg: rgba(26, 27, 38, 0.85);
+            --input-bg: rgba(19, 20, 31, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #9899ac;
+            --accent-color: #6c5dd3;
+            --border-color: #2e2f45;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .register-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .register-header h1 {
+            color: var(--text-primary);
+            font-size: 32px;
+            margin: 0 0 8px 0;
+            font-weight: 600;
+        }
+
+        .register-header p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            background: var(--input-bg);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(108, 93, 211, 0.1);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239899ac' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background: #5a4db8;
+            transform: translateY(-2px);
+        }
+
+        .login-prompt {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .login-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        .input-glow {
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            border-radius: 13px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .form-control:focus + .input-glow {
+            opacity: 1;
+            box-shadow: 0 0 20px rgba(108, 93, 211, 0.3);
+        }
+
+        .password-requirements {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+            transition: color 0.3s ease;
+        }
+
+        .requirement.valid {
+            color: var(--success-color);
+        }
+
+        .requirement.invalid {
+            color: var(--error-color);
+        }
+
+        .requirement-icon {
+            margin-right: 8px;
+            display: inline-flex;
+        }
+
+        .form-control.invalid {
+            border-color: var(--error-color);
+        }
+
+        .form-control.valid {
+            border-color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Create Account</h1>
+            <p>Join us to start your journey</p>
+        </div>
+
+        <!-- <form action="{{ url_for('register') }}" method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name:</label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" required>
+            </div>
+    
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+    
+            <div class="mb-3">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+    
+            <div class="mb-3">
+                <label for="role" class="form-label">Select Role:</label>
+                <select name="role" id="role" class="form-control" required>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+    
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form> -->
+        
+        <form action="{{ url_for('register') }}" method="POST" id="registerForm">
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <div class="input-wrapper">
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" required>
+                    <div class="input-glow"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
+                    <div class="input-glow"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password:</label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5C5.636 5 2 12 2 12C2 12 5.636 19 12 19C18.364 19 22 12 22 12C22 12 18.364 5 12 5Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                    <div class="input-glow"></div>
+                </div>
+                <div class="password-requirements">
+                    <div class="requirement" data-requirement="length">
+                        <span class="requirement-icon">○</span>
+                        At least 8 characters long
+                    </div>
+                    <div class="requirement" data-requirement="uppercase">
+                        <span class="requirement-icon">○</span>
+                        Contains uppercase letter
+                    </div>
+                    <div class="requirement" data-requirement="lowercase">
+                        <span class="requirement-icon">○</span>
+                        Contains lowercase letter
+                    </div>
+                    <div class="requirement" data-requirement="number">
+                        <span class="requirement-icon">○</span>
+                        Contains number
+                    </div>
+                    <div class="requirement" data-requirement="special">
+                        <span class="requirement-icon">○</span>
+                        Contains special character
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="role" class="form-label">Select Role:</label>
+                <div class="input-wrapper">
+                    <select name="role" id="role" class="form-control" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <div class="input-glow"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register" id="submitButton" disabled>Create Account</button>
+
+            <p class="login-prompt">
+                Already have an account? <a href="{{ url_for('login') }}" class="login-link">Login here</a>
+            </p>
+        </form>
+    </div>
+
+
+
+    <script>
+        // Three.js Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Mouse interaction setup
+        const mouse = new THREE.Vector2();
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        // Create particles
+        const particles = new THREE.BufferGeometry();
+        const particleCount = 2000;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        const colorPalette = [
+            new THREE.Color(0x6c5dd3),
+            new THREE.Color(0x8675ff),
+            new THREE.Color(0x5a4db8),
+            new THREE.Color(0x4a3f99),
+            new THREE.Color(0x9899ac)
+        ];
+
+        for(let i = 0; i < particleCount * 3; i += 3) {
+            const radius = 15;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos((Math.random() * 2) - 1);
+            
+            positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+            positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            positions[i + 2] = radius * Math.cos(phi);
+
+            const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            colors[i] = color.r;
+            colors[i + 1] = color.g;
+            colors[i + 2] = color.b;
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            sizeAttenuation: true
+        });
+
+        const particleSystem = new THREE.Points(particles, material);
+        scene.add(particleSystem);
+        camera.position.z = 20;
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const targetRotationX = mouse.y * 0.5;
+            const targetRotationY = mouse.x * 0.5;
+            
+            particleSystem.rotation.x += (targetRotationX - particleSystem.rotation.x) * 0.05;
+            particleSystem.rotation.y += (targetRotationY - particleSystem.rotation.y) * 0.05;
+            particleSystem.rotation.z += 0.001;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        // GSAP Animations
+        gsap.from('.register-container', {
+            duration: 1,
+            y: 30,
+            opacity: 0,
+            ease: 'power3.out'
+        });
+
+        gsap.from('.register-header', {
+            duration: 0.8,
+            y: -20,
+            opacity: 0,
+            delay: 0.3,
+            ease: 'power2.out'
+        });
+
+        gsap.from('.form-group', {
+            duration: 0.6,
+            y: 20,
+            opacity: 0,
+            stagger: 0.2,
+            delay: 0.5,
+            ease: 'power2.out'
+        });
+
+        // Password toggle
+        const passwordToggle = document.querySelector('.password-toggle');
+
+        passwordToggle.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            if (type === 'password') {
+                passwordToggle.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5C5.636 5 2 12 2 12C2 12 5.636 19 12 19C18.364 19 22 12 22 12C22 12 18.364 5 12 5Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>`;
+            } else {
+                passwordToggle.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>`;
+            }
+        });
+
+        const passwordInput = document.getElementById('password');
+        const submitButton = document.getElementById('submitButton');
+        const requirements = {
+            length: password => password.length >= 8,
+            uppercase: password => /[A-Z]/.test(password),
+            lowercase: password => /[a-z]/.test(password),
+            number: password => /[0-9]/.test(password),
+            special: password => /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+
+        function updateRequirements(password) {
+            let allValid = true;
+            
+            Object.entries(requirements).forEach(([requirement, validateFn]) => {
+                const element = document.querySelector(`[data-requirement="${requirement}"]`);
+                const isValid = validateFn(password);
+                
+                element.classList.toggle('valid', isValid);
+                element.classList.toggle('invalid', !isValid);
+                
+                const icon = element.querySelector('.requirement-icon');
+                icon.textContent = isValid ? '✓' : '○';
+                
+                if (!isValid) allValid = false;
+            });
+
+            passwordInput.classList.toggle('valid', allValid);
+            passwordInput.classList.toggle('invalid', !allValid);
+            submitButton.disabled = !allValid;
+            
+            return allValid;
+        }
+
+        passwordInput.addEventListener('input', (e) => {
+            updateRequirements(e.target.value);
+        });
+
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            const password = passwordInput.value;
+            const isValid = updateRequirements(password);
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+        // Input animations
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                gsap.to(input, {
+                    scale: 1.02,
+                    duration: 0.2,
+                    ease: 'power2.out'
+                });
+            });
+
+            input.addEventListener('blur', () => {
+                gsap.to(input, {
+                    scale: 1,
+                    duration: 0.2,
+                    ease: 'power2.out'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

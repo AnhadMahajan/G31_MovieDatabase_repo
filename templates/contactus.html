@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Pariksha</title>
+<style>
+  
+  
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212; /* For full page matching the dark theme */
+     color: #ffffff;
+ } 
+
+
+
+.logo span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.nav-links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #8a8a8a;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+}
+
+.language-selector {
+    background: none;
+    border: none;
+    font-size: 16px;
+    margin-right: 15px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.language-selector:hover {
+    color: #8a8a8a;
+}
+
+.contact-sales,
+.login,
+.sign-up {
+    text-decoration: none;
+    font-size: 14px;
+    margin-right: 15px;
+    color: #ffffff;
+    transition: color 0.3s;
+}
+
+.contact-sales:hover,
+.login:hover {
+    color: #8a8a8a;
+}
+
+.sign-up {
+    padding: 8px 15px;
+    background-color: #6a4ffc; /* Purple button background */
+    color: #ffffff;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.sign-up:hover {
+    background-color: #593fcc;
+}
+
+/* From Uiverse.io by G4b413l */ 
+.card22 svg {
+height: 25px;
+}
+
+.card22 {
+position: relative;
+display: flex;
+align-items: center;
+justify-content: center;
+background: #e7e7e7;
+box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+overflow: hidden;
+height: 50px;
+width: 200px;
+}
+
+.card22::before, .card22::after {
+position: absolute;
+display: flex;
+align-items: center;
+width: 50%;
+height: 100%;
+transition: 0.25s linear;
+z-index: 1;
+}
+
+.card22::before {
+content: "";
+left: 0;
+justify-content: flex-end;
+background-color: #4d60b6;
+}
+
+.card22::after {
+content: "";
+right: 0;
+justify-content: flex-start;
+background-color: #4453a6;
+}
+
+.card22:hover {
+box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.card22:hover span {
+opacity: 0;
+z-index: -3;
+}
+
+.card22:hover::before {
+opacity: 0.5;
+transform: translateY(-100%);
+}
+
+.card22:hover::after {
+opacity: 0.5;
+transform: translateY(100%);
+}
+
+.card22 span {
+position: absolute;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+height: 100%;
+color: whitesmoke;
+font-family: 'Fira Mono', monospace;
+font-size: 24px;
+font-weight: 700;
+opacity: 1;
+transition: opacity 0.25s;
+z-index: 2;
+}
+
+.card22 .social-link {
+position: relative;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 25%;
+height: 100%;
+color: whitesmoke;
+font-size: 24px;
+text-decoration: none;
+transition: 0.25s;
+}
+
+.card22 .social-link svg {
+text-shadow: 1px 1px rgba(31, 74, 121, 0.7);
+transform: scale(1);
+}
+
+.card22 .social-link:hover {
+background-color: rgba(249, 244, 255, 0.774);
+animation: bounce_613 0.4s linear;
+}
+
+@keyframes bounce_613 {
+40% {
+transform: scale(1.4);
+}
+
+60% {
+transform: scale(0.8);
+}
+
+80% {
+transform: scale(1.2);
+}
+
+100% {
+transform: scale(1);
+}
+}
+
+a{
+text-decoration: none;
+color: white;
+}
+
+.txt3{
+display: flex;
+align-items: center;
+justify-content: center;
+/* font-size: 15px; */
+margin-bottom: 5vh;
+font-family: "Bebas Neue", sans-serif;
+font-weight: 400;
+font-style: normal;
+/* width: 100%; */
+/* height: 10vh; */
+}
+
+ 
+  </style>
+  
+</head>
+<body class="bg-gray-900 text-white font-sans">
+
+  
+  <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
+  <main class="relative z-10 " style="margin-top: 10vh;">
+    <div class="text-center py-12">
+      <h1 class="text-5xl font-bold mb-4 text-cyan-400">Contact Us</h1>
+      <p class="text-lg text-gray-300">We are here to help! Feel free to drop us a message.</p>
+    </div>
+
+    <div id="lottie-animation" class="flex justify-center mb-10">
+      <div class="w-64 h-64" id="lottie"></div>
+    </div>
+
+    <section class="text-center my-8">
+      <h2 class="text-2xl mb-4 text-white">Follow Us</h2>
+      <div class="flex justify-center gap-6">
+        <a href="https://facebook.com/" target="_blank" class="text-3xl text-white hover:text-blue-400 transition-transform transform hover:scale-110">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://x.com/anhad_mahajan06" target="_blank" class="text-3xl text-white hover:text-cyan-400 transition-transform transform hover:scale-110">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="https://www.instagram.com/anhadmahajan_/" target="_blank" class="text-3xl text-white hover:text-pink-400 transition-transform transform hover:scale-110">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/anhad-mahajan-974147313/" target="_blank" class="text-3xl text-white hover:text-blue-600 transition-transform transform hover:scale-110">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </div>
+    </section>
+
+    <section class="container mx-auto px-4 py-10 max-w-lg">
+      <div class="bg-gray-800 p-8 rounded-xl shadow-xl">
+        <h2 class="text-3xl text-center text-white mb-6">Send Us a Message</h2>
+        <form id="contact-form">
+          <div class="mb-4">
+            <input type="text" id="name" placeholder="Your Name" required
+              class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-cyan-400">
+          </div>
+          <div class="mb-4">
+            <input type="email" id="email" placeholder="Your Email" required
+              class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-cyan-400">
+          </div>
+          <div class="mb-6">
+            <textarea rows="5" id="message" placeholder="Your Message" required
+              class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-cyan-400"></textarea>
+          </div>
+          <button type="submit"
+            class="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white py-3 rounded-lg hover:scale-105 transition-transform">
+            Submit
+          </button>
+        </form>
+        <button id="home-btn" class="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg transition-transform">
+          <a href="{{url_for('')}}">Go to Home</a>
+        </button>
+      </div>
+    </section>
+  </main>
+
+<script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js"></script>
+  <script>
+    VANTA.NET({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x0fffff,
+      backgroundColor: 0x1a1a1a,
+    });
+
+    var animation = bodymovin.loadAnimation({
+      container: document.getElementById('lottie'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: 'https://assets10.lottiefiles.com/packages/lf20_r5lyh5cd.json'
+    });
+
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+
+      const formData = { name, email, message };
+      localStorage.setItem('contactFormData', JSON.stringify(formData));
+      alert('Your message has been saved! Thank you for contacting us.');
+      document.getElementById('contact-form').reset();
+    });
+
+    document.getElementById('home-btn').addEventListener('click', function () {
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

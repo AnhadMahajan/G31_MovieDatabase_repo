@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title_block %}Orders Management{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+    .order-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        padding: 1rem;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-accepted {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-accept, .btn-reject {
+        transition: transform 0.2s;
+    }
+
+    .btn-accept:hover, .btn-reject:hover {
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 2rem;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .orders-count {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block main_block %}
+<div class="container py-4">
+    <div class="order-header">
+        <h2 class="mb-0">Review Requests</h2>
+        {% if orders %}
+        <span class="orders-count">{{ orders|length }} orders found</span>
+        {% endif %}
+    </div>
+
+    {% if orders %}
+    <div class="orders-container">
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <h5 class="mb-1">{{ order.book.title }}</h5>
+                    <small class="text-muted">Requested by {{ order.user.name }}</small>
+                </div>
+                <div class="col-md-4 text-md-center">
+                    <span class="status-badge status-{{ order.status.lower() }}">
+                        {{ order.status }}
+                    </span>
+                </div>
+                {% if current_user.role == 'admin' and order.status == 'Pending' %}
+                <div class="col-md-4 text-md-end">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('update_order', order_id=order.id, status='Accepted') }}" 
+                           class="btn btn-success btn-accept">Accept</a>
+                        <a href="{{ url_for('update_order', order_id=order.id, status='Rejected') }}" 
+                           class="btn btn-danger btn-reject">Reject</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-inbox mb-3 text-muted" viewBox="0 0 16 16">
+            <path d="M4.98 4a.5.5 0 0 0-.39.188L1.54 8H6a.5.5 0 0 1 .5.5 1.5 1.5 0 1 0 3 0A.5.5 0 0 1 10 8h4.46l-3.05-3.812A.5.5 0 0 0 11.02 4H4.98zm-1.17-.437A1.5 1.5 0 0 1 4.98 3h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1 .106.374l-.39 3.124A1.5 1.5 0 0 1 14.117 13H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .106-.374l3.7-4.625z"/>
+        </svg>
+        <h5>No Orders Found</h5>
+        <p class="text-muted">There are currently no review requests to display.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate order cards on page load
+    gsap.from('.order-card', {
+        duration: 0.5,
+        opacity: 0,
+        y: 20,
+        stagger: 0.1,
+        ease: 'power2.out'
+    });
+
+    // Add hover animations for action buttons
+    const buttons = document.querySelectorAll('.btn-accept, .btn-reject');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', () => {
+            gsap.to(button, {
+                duration: 0.2,
+                y: -2,
+                ease: 'power1.out'
+            });
+        });
+        
+        button.addEventListener('mouseleave', () => {
+            gsap.to(button, {
+                duration: 0.2,
+                y: 0,
+                ease: 'power1.out'
+            });
+        });
+    });
+
+    // Add click animation for status badges
+    const badges = document.querySelectorAll('.status-badge');
+    badges.forEach(badge => {
+        badge.addEventListener('click', () => {
+            gsap.to(badge, {
+                duration: 0.1,
+                scale: 0.95,
+                yoyo: true,
+                repeat: 1
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

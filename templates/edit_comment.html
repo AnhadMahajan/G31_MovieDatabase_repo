@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit Comment - MovieSphere{% endblock %}
+{% block content %}
+  <h1>Edit Comment</h1>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.rating.label }} {{ form.rating(class="form-control") }}
+    </div>
+    <div class="mb-3">
+      {{ form.content.label }} {{ form.content(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+  </form>
+{% endblock %}

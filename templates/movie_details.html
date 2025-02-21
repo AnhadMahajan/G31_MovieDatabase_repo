@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Moviesphere{% endblock %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+{% block main_block %}
+<script src="https://cdn.tailwindcss.com"></script>
+
+<main class="bg-gradient-to-br from-gray-900 via-gray-800 to-yellow-900 text-white min-h-screen flex flex-col items-center p-8">
+
+    <div class="max-w-5xl w-full bg-gray-800 p-6 rounded-lg shadow-lg">
+        <!-- Movie Poster & Info -->
+        <div class="flex flex-col md:flex-row items-center md:items-start">
+            <img src="{{ movie[8] }}" alt="Movie Poster" class="w-80 h-auto rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
+            <div class="md:ml-6 mt-4 md:mt-0">
+                <h1 class="text-4xl font-bold text-yellow-300">{{ movie[2] }}</h1>
+                <p class="text-gray-400"><strong>Original Title:</strong> {{ movie[3] }}</p>
+                <p class="mt-2"><strong>Description:</strong> {{ movie[4] }}</p>
+                
+                <div class="flex items-center gap-4 mt-2">
+                    <p class="text-yellow-400 text-lg">⭐ Rating: {{ movie[5] | round(1) if movie[5] else 'N/A' }}</p>
+                    <p class="text-gray-300">({{ reviews|length }} Reviews)</p>
+                </div>
+                <p><strong>Votes:</strong> {{ movie[6] }}</p>
+                <p><strong>Release Date:</strong> {{ movie[10] }}</p>
+                <p><strong>Runtime:</strong> {{ movie[13] }} minutes</p>
+                <p><strong>Language:</strong> {{ movie[14] }}</p>
+
+                <!-- Watchlist Button -->
+                <!-- Watchlist Button -->
+                <form action="{{ url_for('watchlist', movie_id=movie[0]) }}" method="get">
+                    {% if watchlisted %}
+        <button disabled class="mt-4 bg-gray-600 px-6 py-2 rounded-lg text-white font-semibold cursor-not-allowed">
+            ✅ Added to Watchlist
+        </button>
+    {% else %}
+        <button type="submit" class="mt-4 bg-blue-500 px-6 py-2 rounded-lg text-white font-semibold hover:bg-blue-600 transition">
+            + Add to Watchlist
+        </button>
+    {% endif %}
+</form>
+
+            </div>
+        </div>
+
+        <!-- Genres Section -->
+        <h2 class="text-2xl font-semibold mt-6 text-yellow-300">Genres</h2>
+        <div class="flex flex-wrap gap-2 mt-2">
+            {% for genre in genres %}
+                <span class="px-4 py-1 bg-gray-700 text-gray-300 rounded-full">{{ genre }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Cast Section -->
+        <h2 class="text-2xl font-semibold mt-6 text-yellow-300">Cast</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+            {% for actor in cast %}
+                <div class="text-center bg-gray-900 p-3 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
+                    {% if actor[2] %}
+                        <img src="https://image.tmdb.org/t/p/w200{{ actor[2] }}" alt="{{ actor[0] }}" class="w-24 h-24 object-cover rounded-full mx-auto shadow-md border-2 border-yellow-500">
+                    {% endif %}
+                    <p class="mt-2 font-medium text-yellow-300">{{ actor[0] }}</p>
+                    <p class="text-gray-400 text-sm">{{ actor[1] }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Review Form -->
+        <h2 class="text-2xl font-semibold mt-6 text-yellow-300">Leave a Review</h2>
+        <form method="post" class="mt-4 bg-gray-900 p-4 rounded-lg shadow-lg">
+            <textarea name="comment" class="w-full p-2 bg-gray-800 text-white rounded-lg" placeholder="Write your review..." required></textarea>
+            <label class="block mt-2 text-gray-300">Rating (1-10)</label>
+            <input type="number" name="rating" min="1" max="10" class="w-full p-2 bg-gray-800 text-white rounded-lg mt-1" required>
+            <button type="submit" class="mt-4 w-full bg-yellow-500 text-gray-900 py-2 rounded-lg font-bold hover:bg-yellow-400 transition">Submit Review</button>
+        </form>
+
+        <!-- Display Reviews -->
+        <h2 class="text-2xl font-semibold mt-6 text-yellow-300">User Reviews</h2>
+        <div class="mt-4 space-y-4">
+            {% for review in reviews %}
+
+                <div class="bg-gray-900 p-4 rounded-lg shadow-lg">
+                    
+                    <p class="text-gray-300">"{{ review.comment }}"</p>
+                    <p class="text-yellow-400 font-semibold mt-2">⭐ {{ review.rating }}/10</p>
+                </div>
+            {% else %}
+                <p class="text-gray-400">No reviews yet. Be the first to review!</p>
+            {% endfor %}
+        </div>
+
+        <!-- Back to Movie List -->
+        <div class="mt-6 text-center">
+            <a href="{{ url_for('index') }}" class="text-yellow-400 hover:underline text-lg">← Back to Movie List</a>
+        </div>
+    </div>
+
+    <script>
+        // GSAP Animations
+        gsap.from("h1", { duration: 1, opacity: 0, y: -20, ease: "power3.out" });
+        gsap.from("img", { duration: 1, opacity: 0, scale: 0.9, ease: "power3.out", stagger: 0.2 });
+        gsap.from("p, span", { duration: 1, opacity: 0, y: 10, ease: "power3.out", stagger: 0.1 });
+    </script>
+</main>
+{% endblock %}

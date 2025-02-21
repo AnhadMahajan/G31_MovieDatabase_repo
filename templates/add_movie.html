@@ -1,0 +1,510 @@
+{% extends 'base.html' %}
+
+{% block title_block %}Add Movie{% endblock %}
+
+{% block main_block %}
+<style>
+  /* Dark theme styling */
+  body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+  }
+  
+  .content-wrapper {
+    position: relative;
+    padding: 30px 0;
+    min-height: calc(100vh - 60px);
+    z-index: 1; /* Ensure content stays above canvas */
+  }
+  
+  #bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Behind content */
+  }
+  
+  .form-card {
+    background: #1e293b;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    max-width: 650px;
+    margin: 0 auto;
+    border: 1px solid #334155;
+    position: relative; /* Ensure proper stacking context */
+  }
+  
+  .form-title {
+    color: #60a5fa;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 600;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+  
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    outline: none;
+  }
+  
+  .file-upload {
+    border: 2px dashed #475569;
+    border-radius: 6px;
+    padding: 25px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: rgba(15, 23, 42, 0.5);
+  }
+  
+  .file-upload:hover {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  
+  .file-upload-text {
+    margin-bottom: 0;
+    color: #94a3b8;
+  }
+  
+  .btn-submit {
+    display: inline-block;
+    background-color: #3b82f6;
+    color: #fff;
+    font-weight: 500;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    font-size: 16px;
+    position: relative; /* Ensure proper stacking */
+    z-index: 5; /* Higher than background */
+  }
+  
+  .btn-submit:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+  
+  .hidden-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  
+  .file-name {
+    display: none;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #60a5fa;
+  }
+  
+  /* Ensure form elements are visible */
+  form {
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Add an additional glow effect to make button more visible */
+  .btn-container {
+    margin-top: 30px;
+    position: relative;
+  }
+  
+  .btn-container::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: 10px;
+    z-index: 2;
+    filter: blur(8px);
+  }
+  
+  .btn-submit {
+    position: relative;
+    z-index: 3;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+  }
+</style>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="content-wrapper">
+  <div class="container">
+    <div class="form-card">
+      <h2 class="form-title">Add a New Movie</h2>
+      <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label" for="movie-title">Movie Title:</label>
+          <input id="movie-title" type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="movie-cast">Discription:</label>
+          <input id="movie-cast" type="text" name="author" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="movie-rating">Rating:</label>
+          <input id="movie-rating" type="number" name="price" class="form-control" step="0.01" min="0" max="10" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Upload Image:</label>
+          <div class="file-upload" id="file-drop-area">
+            <p class="file-upload-text">Drag and drop your image here or click to browse</p>
+            <p class="file-name" id="file-name"></p>
+            <input type="file" name="image" id="image-upload" class="hidden-input" accept="image/*" required>
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <button type="submit" class="btn-submit">Add Movie</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.159.0/three.min.js"></script>
+
+<script>
+  // Interactive 3D Background with Particles
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a16); // Dark blue/purple background
+  
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 30;
+  
+  // Mouse tracking
+  const mouse = new THREE.Vector2();
+  const target = new THREE.Vector2();
+  
+  window.addEventListener('mousemove', (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  });
+  
+  // Create particle system for stars/space effect
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particleCount = 2000;
+  
+  const posArray = new Float32Array(particleCount * 3);
+  const sizes = new Float32Array(particleCount);
+  
+  // Fill arrays with random positions and sizes
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    // Positions (spread wider)
+    posArray[i] = (Math.random() - 0.5) * 80;
+    posArray[i + 1] = (Math.random() - 0.5) * 80;
+    posArray[i + 2] = (Math.random() - 0.5) * 60 - 20;
+    
+    // Sizes (more variation)
+    sizes[i/3] = Math.random() * 3;
+  }
+  
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+  particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+  
+  // Create shimmering particle material
+  const particlesMaterial = new THREE.PointsMaterial({
+    size: 0.2,
+    color: 0x3b82f6,
+    transparent: true,
+    opacity: 0.8,
+    vertexColors: false,
+    sizeAttenuation: true,
+  });
+  
+  // Create the particle system
+  const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particleSystem);
+  
+  // Add glowing center light effect
+  const glowGeometry = new THREE.SphereGeometry(2, 32, 32);
+  const glowMaterial = new THREE.MeshBasicMaterial({
+    color: 0x60a5fa,
+    transparent: true,
+    opacity: 0.6
+  });
+  const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
+  scene.add(glowSphere);
+  
+  // Add orbiting film strip rings
+  const filmStrips = new THREE.Group();
+  
+  function createFilmRing(radius, count, color, height) {
+    const ringGroup = new THREE.Group();
+    
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const filmGeometry = new THREE.BoxGeometry(4, height, 0.05);
+      const filmMaterial = new THREE.MeshBasicMaterial({ 
+        color: color,
+        transparent: true,
+        opacity: 0.7
+      });
+      
+      const film = new THREE.Mesh(filmGeometry, filmMaterial);
+      
+      film.position.x = Math.cos(angle) * radius;
+      film.position.z = Math.sin(angle) * radius;
+      film.rotation.y = angle + Math.PI/2;
+      
+      ringGroup.add(film);
+    }
+    
+    return ringGroup;
+  }
+  
+  // Create two orbiting rings
+  const innerRing = createFilmRing(12, 8, 0x3b82f6, 1.2);
+  const outerRing = createFilmRing(20, 12, 0xf472b6, 0.8);
+  
+  innerRing.rotation.x = Math.PI / 6;
+  outerRing.rotation.x = -Math.PI / 8;
+  
+  filmStrips.add(innerRing);
+  filmStrips.add(outerRing);
+  scene.add(filmStrips);
+  
+  // Renderer parameters - ensure background elements don't obscure content
+  renderer.setClearColor(0x000000, 0);
+  renderer.sortObjects = true;
+  renderer.autoClear = true;
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    // Smooth mouse following
+    target.x = mouse.x * 0.1;
+    target.y = mouse.y * 0.1;
+    
+    camera.rotation.x += (target.y - camera.rotation.x) * 0.01;
+    camera.rotation.y += (target.x - camera.rotation.y) * 0.01;
+    
+    // Rotate film strip rings
+    innerRing.rotation.y += 0.003;
+    outerRing.rotation.y -= 0.002;
+    
+    // Make particles gently pulse and shimmer
+    particleSystem.rotation.y += 0.0005;
+    particleSystem.rotation.x += 0.0002;
+    
+    // Pulse glow effect
+    const pulseScale = 1 + 0.1 * Math.sin(Date.now() * 0.001);
+    glowSphere.scale.set(pulseScale, pulseScale, pulseScale);
+    glowSphere.material.opacity = 0.4 + 0.2 * Math.sin(Date.now() * 0.002);
+    
+    // Interactive effect - particles move away from cursor
+    const positions = particlesGeometry.attributes.position.array;
+    
+    for (let i = 0; i < positions.length; i += 3) {
+      // Add subtle motion to particles based on mouse position
+      const x = positions[i];
+      const y = positions[i + 1];
+      const z = positions[i + 2];
+      
+      // Calculate distance from mouse position
+      const dx = x / 30 - mouse.x;
+      const dy = y / 30 - mouse.y;
+      
+      // Apply subtle force away from mouse
+      positions[i] += dx * 0.01;
+      positions[i + 1] += dy * 0.01;
+      
+      // Apply gravity to slowly return to original position
+      positions[i] += (posArray[i] - positions[i]) * 0.01;
+      positions[i + 1] += (posArray[i + 1] - positions[i + 1]) * 0.01;
+      positions[i + 2] += (posArray[i + 2] - positions[i + 2]) * 0.01;
+    }
+    
+    particlesGeometry.attributes.position.needsUpdate = true;
+    
+    renderer.render(scene, camera);
+  }
+  
+  animate();
+  
+  // Form animations and functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // File upload handling
+    const fileDropArea = document.getElementById('file-drop-area');
+    const fileInput = document.getElementById('image-upload');
+    const fileName = document.getElementById('file-name');
+    
+    // Trigger file input when clicking on drop area
+    fileDropArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    // Handle file selection
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = fileInput.files[0].name;
+        fileName.style.display = 'block';
+        fileDropArea.style.borderColor = '#3b82f6';
+        fileDropArea.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+      }
+    });
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      fileDropArea.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      fileDropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    // Remove highlight when item is dragged away
+    ['dragleave', 'drop'].forEach(eventName => {
+      fileDropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      fileDropArea.style.borderColor = '#3b82f6';
+      fileDropArea.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+    }
+    
+    function unhighlight() {
+      fileDropArea.style.borderColor = '#475569';
+      fileDropArea.style.backgroundColor = 'rgba(15, 23, 42, 0.5)';
+    }
+    
+    // Handle dropped files
+    fileDropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      fileInput.files = files;
+      
+      if (files.length > 0) {
+        fileName.textContent = files[0].name;
+        fileName.style.display = 'block';
+        highlight();
+      }
+    }
+    
+    // Enhanced GSAP animations with glow effects
+    gsap.from('.form-card', {
+      y: 30,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out'
+    });
+    
+    gsap.from('.form-title', {
+      y: -20,
+      opacity: 0,
+      duration: 0.8,
+      delay: 0.3,
+      ease: 'back.out(1.7)'
+    });
+    
+    gsap.from('.form-group', {
+      y: 20,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.15,
+      delay: 0.5,
+      ease: 'power2.out'
+    });
+    
+    // Make sure button is very visible with extra animation
+    gsap.fromTo('.btn-submit', 
+      {
+        scale: 0.9,
+        opacity: 0,
+      },
+      {
+        scale: 1,
+        opacity: 1,
+        duration: 0.8,
+        delay: 1.1,
+        ease: 'elastic.out(1, 0.6)',
+        onComplete: function() {
+          // Add pulsing highlight effect
+          gsap.to('.btn-submit', {
+            boxShadow: '0 0 20px rgba(59, 130, 246, 0.7)',
+            yoyo: true,
+            repeat: 2,
+            duration: 0.8
+          });
+        }
+      }
+    );
+    
+    // Make sure button stays visible by adding a delayed check
+    setTimeout(() => {
+      const submitButton = document.querySelector('.btn-submit');
+      if (submitButton) {
+        submitButton.style.zIndex = '100';
+        submitButton.style.position = 'relative';
+        submitButton.style.opacity = '1';
+      }
+    }, 1500);
+  });
+</script>
+{% endblock %}

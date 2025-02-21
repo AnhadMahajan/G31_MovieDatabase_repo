@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Scrolling Website to Imagination{% endblock %}
+
+{% block extra_head %}
+
+    <!-- Swiper.js for Carousel -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+    <!-- GSAP & Tailwind -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Hero Section Styling */
+        .hero-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+        }
+
+        .hero-slide {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(40%);
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 10%;
+            left: 5%;
+            z-index: 2;
+            color: white;
+            max-width: 600px;
+        }
+
+        .top10-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .top10-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-yellow-900 text-white min-h-screen">
+  {% endblock %}
+
+  {% block content %}
+
+    <!-- Hero Carousel Section -->
+    <div class="hero-container w-full">
+        <div class="swiper hero-swiper w-full h-full">
+            <div class="swiper-wrapper">
+                {% for movie in movies[:6] %}
+                <div class="swiper-slide hero-slide">
+                    <img src="{{ movie[9] or movie[8] }}" class="hero-bg">
+                    <div class="hero-content">
+                        <h1 class="text-4xl font-bold">{{ movie[1] }}</h1>
+                        <p class="text-gray-300 mt-2">{{ movie[4] }}</p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="{{ url_for('movie_details', movie_id=movie[0]) }}" class="bg-blue-500 px-6 py-2 rounded-lg text-white font-semibold hover:bg-blue-600 transition">
+                                ▶ Watch Now
+                            </a>
+                            <button class="bg-gray-700 px-6 py-2 rounded-lg text-white font-semibold hover:bg-gray-600 transition">+ Watchlist</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Top 10 Movies Section -->
+    <div class="mt-10 max-w-7xl mx-auto px-6">
+        <h2 class="text-3xl font-bold mb-4">🔥 Top 10 Movies</h2>
+        <div class="top10-scroll">
+            {% for movie in movies[:10] %}
+            <div class="min-w-[200px] bg-gray-800 p-3 rounded-lg shadow-lg">
+                <a href="{{ url_for('movie_details', movie_id=movie[0]) }}">
+                    <img src="{{ movie[3] }}" alt="{{ movie[1] }}" class="w-full h-40 object-cover rounded-lg">
+                    <h3 class="text-lg font-semibold mt-2 text-center">{{ movie[1] }}</h3>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Movie Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl mt-10 mx-auto px-6">
+        {% for movie in movies %}
+        <div class="movie-card bg-gray-800 rounded-lg p-4 shadow-lg transform hover:scale-105 transition duration-300">
+            <a href="{{ url_for('movie_details', movie_id=movie[0]) }}">
+                {% if movie[3] and movie[3] != '' %}
+                    <img src="{{ movie[3] }}" alt="{{ movie[1] }}" class="w-full h-64 object-cover rounded-lg shadow-md">
+                {% else %}
+                    <div class="w-full h-64 flex items-center justify-center bg-gray-700 rounded-lg">
+                        <span class="text-gray-400">No Image Available</span>
+                    </div>
+                {% endif %}
+                <div class="mt-4">
+                    <h2 class="text-xl font-semibold">{{ movie[1] }}</h2>
+                    <p class="text-yellow-400 text-sm">⭐ Rating: {{ movie[2] | round(1) if movie[2] else 'N/A' }}</p>
+                </div>
+            </a>
+        </div>
+        {% else %}
+        <p class="text-gray-300">No movies available.</p>
+        {% endfor %}
+    </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        // GSAP Animations
+        gsap.from("h1", { duration: 1, opacity: 0, y: -20, ease: "power3.out" });
+
+        // Initialize Hero Swiper
+        var heroSwiper = new Swiper('.hero-swiper', {
+            slidesPerView: 1,
+            loop: true,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true
+            }
+        });
+    </script>
+
+    {% endblock %}
